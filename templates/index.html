@@ -16,5 +16,11 @@
 <article class="card metric"><span class="label">Disco /</span><strong id="disk-usage">—</strong><div class="bar"><i id="disk-bar"></i></div><small id="disk-detail">—</small></article>
 <article class="card metric"><span class="label">Procesos</span><strong id="process-count">—</strong><small>Procesos detectados</small></article>
 </section>
+<h2>Infraestructura</h2>
+<section class="grid infra">
+<article class="card"><span class="label">Docker</span><strong id="docker-summary">—</strong><small id="docker-detail">—</small></article>
+<article class="card"><span class="label">Servicios</span><strong id="services-summary">—</strong><small id="services-detail">—</small></article>
+<article class="card"><span class="label">Red</span><strong id="network-summary">—</strong><small id="network-detail">—</small></article>
+</section>
 <section class="footer-row"><span id="updated">Sin actualizar</span><button id="refresh">Actualizar ahora</button></section>
 </main><script src="{{ url_for('static', path='app.js') }}"></script></body></html>

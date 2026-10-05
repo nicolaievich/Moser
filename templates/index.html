@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ title }}</title><link rel="stylesheet" href="{{ url_for('static', path='style.css') }}"></head>
+<body><main class="container">
+<header><div><p class="eyebrow">MOSER · PANÓPTICO DEL SERVIDOR</p><h1 id="hostname">Servidor</h1><p id="os-summary">Cargando…</p></div><div id="health" class="status">● Inicializando</div></header>
+<section class="grid hardware">
+<article class="card"><span class="label">CPU</span><strong id="cpu-model">—</strong><small id="cpu-details">—</small></article>
+<article class="card"><span class="label">RAM</span><strong id="ram-total">—</strong><small>Memoria instalada</small></article>
+<article class="card"><span class="label">Motherboard</span><strong id="board-model">—</strong><small id="board-vendor">—</small></article>
+<article class="card"><span class="label">Kernel</span><strong id="kernel">—</strong><small id="architecture">—</small></article>
+</section>
+<h2>Estado en vivo</h2><section class="grid metrics">
+<article class="card metric"><span class="label">CPU</span><strong id="cpu-usage">—</strong><div class="bar"><i id="cpu-bar"></i></div><small id="load">Carga: —</small></article>
+<article class="card metric"><span class="label">RAM</span><strong id="memory-usage">—</strong><div class="bar"><i id="memory-bar"></i></div><small id="memory-detail">—</small></article>
+<article class="card metric"><span class="label">Disco /</span><strong id="disk-usage">—</strong><div class="bar"><i id="disk-bar"></i></div><small id="disk-detail">—</small></article>
+<article class="card metric"><span class="label">Procesos</span><strong id="process-count">—</strong><small>Procesos detectados</small></article>
+</section>
+<section class="footer-row"><span id="updated">Sin actualizar</span><button id="refresh">Actualizar ahora</button></section>
+</main><script src="{{ url_for('static', path='app.js') }}"></script></body></html>

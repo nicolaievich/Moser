@@ -80,7 +80,7 @@ Flujo previsto:
 
 Las contraseñas no se almacenarán en texto plano. Se utilizará Argon2id.
 
-En la primera ejecución, Moser muestra `/setup` para crear el usuario inicial. Una vez creado, el monitor queda protegido por sesión. La base SQLite se guarda fuera del código mediante `MOSER_DATA_DIR` cuando se configura; por defecto se utiliza `data/moser.db`.
+En la primera ejecución, Moser muestra `/setup` para crear el usuario inicial. El registro solicita usuario, contraseña y confirmación; muestra la complejidad de la contraseña y permite verla mientras se escribe. Una vez creado, el monitor queda protegido por sesión. La base SQLite se guarda fuera del código mediante `MOSER_DATA_DIR` cuando se configura; por defecto se utiliza `data/moser.db`.
 
 ## Pantallas
 

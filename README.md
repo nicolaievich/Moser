@@ -80,6 +80,8 @@ Flujo previsto:
 
 Las contraseñas no se almacenarán en texto plano. Se utilizará Argon2id.
 
+En la primera ejecución, Moser muestra `/setup` para crear el usuario inicial. Una vez creado, el monitor queda protegido por sesión. La base SQLite se guarda fuera del código mediante `MOSER_DATA_DIR` cuando se configura; por defecto se utiliza `data/moser.db`.
+
 ## Pantallas
 
 ### Registro
@@ -208,6 +210,11 @@ Cada módulo tendrá una responsabilidad concreta y el código estará ampliamen
 
 ### 1. Autenticación
 - Base de datos.
+- Configuración inicial del primer usuario.
+- Login y cierre de sesión.
+- Protección de la interfaz y API.
+- Contraseñas con Argon2id.
+
 - Registro.
 - Confirmación de email.
 - Login.
@@ -273,7 +280,7 @@ Principios:
 
 ## Estado del proyecto
 
-**Pre-alpha — diseño y arquitectura.**
+**Pre-alpha — autenticación inicial + monitor funcional.**
 
 La versión **1.0** priorizará:
 

@@ -3,7 +3,7 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{ title }}</title><link rel="stylesheet" href="{{ url_for('static', path='style.css') }}"></head>
 <body><main class="container">
-<header><div><p class="eyebrow">MOSER · PANÓPTICO DEL SERVIDOR</p><h1 id="hostname">Servidor</h1><p id="os-summary">Cargando…</p></div><div id="health" class="status">● Inicializando</div></header>
+<header><div><p class="eyebrow">MOSER · PANÓPTICO DEL SERVIDOR</p><h1 id="hostname">Servidor</h1><p id="os-summary">Cargando…</p></div><div class="header-actions"><div id="health" class="status">● Inicializando</div><form method="post" action="/logout"><button type="submit">Cerrar sesión</button></form></div></header>
 <section class="grid hardware">
 <article class="card"><span class="label">CPU</span><strong id="cpu-model">—</strong><small id="cpu-details">—</small></article>
 <article class="card"><span class="label">RAM</span><strong id="ram-total">—</strong><small>Memoria instalada</small></article>

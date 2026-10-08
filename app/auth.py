@@ -32,12 +32,27 @@ def user_exists() -> bool:
         connection.close()
 
 
+def password_strength_error(password: str) -> str | None:
+    if len(password) < 10:
+        return "La contraseña debe tener al menos 10 caracteres."
+    checks = [
+        any(char.islower() for char in password),
+        any(char.isupper() for char in password),
+        any(char.isdigit() for char in password),
+        any(not char.isalnum() for char in password),
+    ]
+    if sum(checks) < 3:
+        return "La contraseña debe combinar mayúsculas, minúsculas, números y símbolos (al menos 3 de estos 4 tipos)."
+    return None
+
+
 def create_user(username: str, password: str) -> None:
     username = username.strip()
     if len(username) < 3:
         raise ValueError("El usuario debe tener al menos 3 caracteres.")
-    if len(password) < 8:
-        raise ValueError("La contraseña debe tener al menos 8 caracteres.")
+    password_error = password_strength_error(password)
+    if password_error:
+        raise ValueError(password_error)
     password_hash = _password_hasher.hash(password)
     connection = _connect()
     try:

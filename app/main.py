@@ -38,9 +38,14 @@ async def setup_page(request: Request):
 
 
 @app.post("/setup", response_class=HTMLResponse)
-async def setup(request: Request, username: str = Form(...), password: str = Form(...)):
+async def setup(request: Request, username: str = Form(...), password: str = Form(...), password_confirm: str = Form(...)):
     if user_exists():
         return RedirectResponse("/login", status_code=303)
+    if password != password_confirm:
+        return templates.TemplateResponse(request=request, name="login.html", context={
+            "title": "Configuración inicial · Moser", "heading": "Configuración inicial",
+            "action": "/setup", "button": "Crear acceso", "autocomplete": "new-password", "error": "Las contraseñas no coinciden.",
+        }, status_code=400)
     try:
         create_user(username, password)
     except ValueError as exc:

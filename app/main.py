@@ -15,7 +15,7 @@ from app.monitoring.system import get_hardware_info, get_system_status
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-app = FastAPI(title="Moser", description="Panóptico del servidor: monitor ligero de Linux.", version="0.2.0")
+app = FastAPI(title="Moser", description="Panóptico del servidor: monitor ligero de Linux.", version="0.3.0")
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.environ.get("MOSER_SESSION_SECRET", "change-me-in-production"),
@@ -93,7 +93,7 @@ async def logout(request: Request):
 async def monitor(request: Request):
     if not request.session.get("authenticated"):
         return RedirectResponse("/setup" if not user_exists() else "/login", status_code=303)
-    return templates.TemplateResponse(request=request, name="index.html", context={"title": "Moser"})
+    return templates.TemplateResponse(request=request, name="index.html", context={"title": "Moser · v0.3.0"})
 
 
 @app.get("/api/system/info")

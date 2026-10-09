@@ -1,0 +1,35 @@
+[Unit]
+Description=Moser - monitor ligero de servidores Linux
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=moser
+Group=moser
+WorkingDirectory=@MOSER_ROOT@
+EnvironmentFile=/etc/moser/moser.env
+ExecStart=@MOSER_ROOT@/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 3000
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+KillSignal=SIGINT
+UMask=0077
+
+# Endurecimiento: solo los datos de Moser son escribibles por el servicio.
+NoNewPrivileges=true
+CapabilityBoundingSet=
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/moser
+
+[Install]
+WantedBy=multi-user.target

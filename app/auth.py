@@ -1,4 +1,7 @@
+"""Autenticación local y almacenamiento SQLite de Moser."""
+
 from pathlib import Path
+import os
 import sqlite3
 
 from argon2 import PasswordHasher
@@ -6,22 +9,61 @@ from argon2.exceptions import VerifyMismatchError
 from fastapi import HTTPException, Request
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = Path(__import__("os").environ.get("MOSER_DATA_DIR", BASE_DIR / "data"))
+DATA_DIR = Path(os.environ.get("MOSER_DATA_DIR", BASE_DIR / "data")).expanduser()
 DB_PATH = DATA_DIR / "moser.db"
 _password_hasher = PasswordHasher()
 
 
 def _connect():
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    connection = sqlite3.connect(DB_PATH)
-    connection.execute("""CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )""")
-    connection.commit()
-    return connection
+    """Abre SQLite creando archivos nuevos con permisos privados por defecto."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True, mode=0o700)
+    old_umask = os.umask(0o077)
+    try:
+        connection = sqlite3.connect(DB_PATH, timeout=5)
+    finally:
+        os.umask(old_umask)
+
+    try:
+        connection.execute("""CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )""")
+        connection.commit()
+        return connection
+    except Exception:
+        connection.close()
+        raise
+
+
+def check_storage_writable() -> None:
+    """Falla al iniciar si Moser no puede escribir en su base de datos.
+
+    Detecta errores de permisos al arrancar, en vez de mostrarlos como un
+    bucle de registro o un error 500 cuando el usuario intenta crear su cuenta.
+    """
+    connection = None
+    try:
+        connection = _connect()
+        connection.execute("SAVEPOINT moser_permission_check")
+        connection.execute(
+            "CREATE TABLE IF NOT EXISTS _moser_permission_check (id INTEGER PRIMARY KEY)"
+        )
+        connection.execute("INSERT INTO _moser_permission_check DEFAULT VALUES")
+        connection.execute("DELETE FROM _moser_permission_check")
+        connection.execute("DROP TABLE _moser_permission_check")
+        connection.execute("RELEASE SAVEPOINT moser_permission_check")
+        connection.commit()
+    except (OSError, sqlite3.Error) as exc:
+        raise RuntimeError(
+            f"Moser no puede escribir en la base de datos {DB_PATH}. "
+            f"Revisá el propietario y los permisos del directorio {DATA_DIR}. "
+            "No ejecutes Moser con sudo para solucionar este problema."
+        ) from exc
+    finally:
+        if connection is not None:
+            connection.close()
 
 
 def user_exists() -> bool:

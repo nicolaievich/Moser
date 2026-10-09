@@ -39,7 +39,7 @@ if [ ! -x "$ROOT/venv/bin/uvicorn" ] || [ ! -x "$ROOT/venv/bin/python" ]; then
   exit 1
 fi
 
-if pgrep -f '[u]vicorn app.main:app' >/dev/null 2>&1; then
+if ! systemctl is-active --quiet moser.service && pgrep -f '[u]vicorn app.main:app' >/dev/null 2>&1; then
   echo "ERROR: parece que Moser ya está ejecutándose manualmente."
   echo "Detenelo con Ctrl+C antes de migrar los datos al servicio."
   exit 1
@@ -123,7 +123,12 @@ sed "s|@MOSER_ROOT@|$ROOT|g" "$ROOT/deploy/moser.service.in" > "$UNIT_FILE"
 chmod 0644 "$UNIT_FILE"
 
 systemctl daemon-reload
-systemctl enable --now moser.service
+systemctl enable moser.service
+if systemctl is-active --quiet moser.service; then
+  systemctl restart moser.service
+else
+  systemctl start moser.service
+fi
 
 echo
 echo "Moser quedó instalado como servicio."

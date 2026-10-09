@@ -1,0 +1,29 @@
+name: tests
+
+on:
+  push:
+    branches: [main, security-installation]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements.txt pytest
+      - name: Validar sintaxis de scripts
+        run: bash -n install.sh start.sh install-service.sh
+      - name: Validar sintaxis de Python
+        run: python -m compileall -q app tests
+      - name: Ejecutar pruebas
+        run: pytest -q

@@ -29,7 +29,7 @@ if not SESSION_SECRET or SESSION_SECRET == "change-me-in-production":
         "configuración local o instalá el servicio con ./install-service.sh."
     )
 
-app = FastAPI(title="Moser", description="Panóptico del servidor: monitor ligero de Linux.", version="0.3.0")
+app = FastAPI(title="Moser", description="Panóptico del servidor: monitor ligero de Linux.", version="0.4.0")
 app.add_middleware(
     SessionMiddleware,
     secret_key=SESSION_SECRET,
@@ -113,7 +113,7 @@ async def logout(request: Request):
 async def monitor(request: Request):
     if not request.session.get("authenticated"):
         return RedirectResponse("/setup" if not user_exists() else "/login", status_code=303)
-    return templates.TemplateResponse(request=request, name="index.html", context={"title": "Moser · v0.3.0"})
+    return templates.TemplateResponse(request=request, name="index.html", context={"title": "Moser · v0.4.0"})
 
 
 @app.get("/api/system/info")

@@ -7,24 +7,44 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.auth import create_user, login_session, logout_session, require_auth, user_exists, verify_user
+from app.auth import (
+    check_storage_writable,
+    create_user,
+    login_session,
+    logout_session,
+    require_auth,
+    user_exists,
+    verify_user,
+)
 from app.monitoring.docker import get_docker_status
 from app.monitoring.network import get_network_info
 from app.monitoring.services import get_services_status
 from app.monitoring.system import get_hardware_info, get_system_status
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+SESSION_SECRET = os.environ.get("MOSER_SESSION_SECRET")
+if not SESSION_SECRET or SESSION_SECRET == "change-me-in-production":
+    raise RuntimeError(
+        "Falta MOSER_SESSION_SECRET. Ejecutá ./install.sh para generar la "
+        "configuración local o instalá el servicio con ./install-service.sh."
+    )
 
 app = FastAPI(title="Moser", description="Panóptico del servidor: monitor ligero de Linux.", version="0.3.0")
 app.add_middleware(
     SessionMiddleware,
-    secret_key=os.environ.get("MOSER_SESSION_SECRET", "change-me-in-production"),
+    secret_key=SESSION_SECRET,
     session_cookie="moser_session",
     https_only=os.environ.get("MOSER_COOKIE_SECURE", "false").lower() == "true",
     same_site="lax",
 )
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
+
+@app.on_event("startup")
+async def validate_storage_on_startup():
+    """No arrancar si SQLite no permite escribir; evitar errores tardíos de registro."""
+    check_storage_writable()
 
 
 @app.get("/setup", response_class=HTMLResponse)
